@@ -1,0 +1,15 @@
+# Not a workspace. pnpm 10+ refuses to run dependency build scripts unless
+# they are listed here; these are the ones this app's dependencies carry
+# (sharp arrives through next for next/image optimisation).
+allowBuilds:
+  '@sentry/cli': true
+  '@tailwindcss/oxide': true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
+
+# Pinned to the version the monorepo lockfile resolved: 7.1.x tightened
+# react-hooks/set-state-in-effect and flags two existing tailor pages that
+# lint clean on 7.0.1. Lift the pin when those pages are revisited.
+overrides:
+  eslint-plugin-react-hooks: 7.0.1

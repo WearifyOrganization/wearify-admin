@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # @wearify/shared is a `link:` to a sibling checkout until it is pinned
+      # to a published version (migration Phase 4C). Until then CI needs the
+      # sibling present at ../wearify-shared.
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/wearify-shared
+          path: ../wearify-shared
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run lint
+      - run: pnpm run type-check
+      - run: pnpm test
+      - run: pnpm run build
+        env:
+          NEXT_PUBLIC_CONVEX_URL: ${{ vars.NEXT_PUBLIC_CONVEX_URL }}

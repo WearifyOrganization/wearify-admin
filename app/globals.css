@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@theme {
+  /* Wearify warm palette */
+  --color-wf-bg: #FBF8F3;
+  --color-wf-panel: #FFFFFF;
+  --color-wf-card: #F5F0E8;
+  --color-wf-border: #E8E0D4;
+  --color-wf-text: #1A1A1A;
+  --color-wf-subtext: #6B5B4F;
+  --color-wf-muted: #9A8D82;
+  --color-wf-green: #2D8544;
+  --color-wf-green-bg: #2D854410;
+  --color-wf-amber: #D4A843;
+  --color-wf-amber-bg: #D4A84310;
+  --color-wf-red: #C0392B;
+  --color-wf-red-bg: #C0392B10;
+  --color-wf-blue: #2C5F7C;
+  --color-wf-blue-bg: #2C5F7C10;
+  --color-wf-primary: #71221D;
+  --color-wf-primary-bg: #71221D10;
+
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  body {
+    font-family: var(--font-sans);
+    background: var(--color-wf-bg);
+    color: var(--color-wf-text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-wf-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-wf-muted);
+}
+
+/* Accessibility (P2-7): honor the OS "reduce motion" preference app-wide.
+   Neutralize animations / transitions / smooth-scroll for users prone to
+   motion sickness. Uses 0.01ms (not 0) so transitionend/animationend still
+   fire — UI that depends on those events keeps working, just instantly. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
