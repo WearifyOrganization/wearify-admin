@@ -16,13 +16,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # @wearify/shared is a `link:` to a sibling checkout until it is pinned
-      # to a published version (migration Phase 4C). Until then CI needs the
-      # sibling present at ../wearify-shared.
-      - uses: actions/checkout@v4
-        with:
-          repository: ${{ github.repository_owner }}/wearify-shared
-          path: ../wearify-shared
+      # @wearify/shared is a git dependency on the private
+      # WearifyOrganization/wearify-shared repository (pinned tag in
+      # package.json, commit in pnpm-lock.yaml). `pnpm install` clones it over
+      # HTTPS, so the runner needs read access to that repository; the default
+      # GITHUB_TOKEN is scoped to this repository only and does not grant it.
+      # That access is configured at the organisation level, not in this file.
 
       - uses: pnpm/action-setup@v4
 
