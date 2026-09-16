@@ -65,11 +65,11 @@ cp .env.example .env.local   # fill NEXT_PUBLIC_CONVEX_URL and NEXT_PUBLIC_CONVE
 pnpm dev
 ```
 
-`@wearify/shared` is currently `link:../wearify-shared`; a sibling checkout of
-`wearify-shared` must exist until the dependency is pinned to a published
-version. `dev` and `build` pass `--webpack` because Turbopack does not resolve
-that symlink outside the project root; drop the flag once the package is
-pinned.
+`@wearify/shared` is pinned to a git tag of the `wearify-shared` repository (see
+`package.json`); the URL currently points at the sibling checkout and the
+deployment phase switches it to the GitHub organisation with no other change.
+`dev` and `build` keep `--webpack` so the bundler and the Sentry webpack
+options match the monorepo's production build.
 
 ## Checks
 
