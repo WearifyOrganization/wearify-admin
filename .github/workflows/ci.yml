@@ -6,6 +6,12 @@ on:
   push:
     branches: [main]
 
+# The workflow's own GITHUB_TOKEN only needs to read this repository. Access to
+# the private backend (for the @wearify/shared dependency) never uses this
+# token; it uses the separately scoped GitHub App token created in the job.
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -17,11 +23,30 @@ jobs:
       - uses: actions/checkout@v4
 
       # @wearify/shared is a git dependency on the private
-      # WearifyOrganization/wearify-shared repository (pinned tag in
-      # package.json, commit in pnpm-lock.yaml). `pnpm install` clones it over
-      # HTTPS, so the runner needs read access to that repository; the default
-      # GITHUB_TOKEN is scoped to this repository only and does not grant it.
-      # That access is configured at the organisation level, not in this file.
+      # WearifyOrganization/wearify-backend repository (tag in package.json,
+      # commit in pnpm-lock.yaml). `pnpm install` clones it over HTTPS with the
+      # system git, and the default GITHUB_TOKEN is scoped to this repository
+      # only. The "Wearify CI" GitHub App is installed on wearify-backend alone;
+      # the token minted here is limited to that repository with contents:read,
+      # expires after an hour and is revoked when the job ends.
+      - name: Create Wearify CI token
+        id: wearify-app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ vars.WEARIFY_CI_APP_ID }}
+          private-key: ${{ secrets.WEARIFY_CI_APP_PRIVATE_KEY }}
+          owner: WearifyOrganization
+          repositories: wearify-backend
+          permission-contents: read
+
+      # Route HTTPS clones of github.com through the App token so pnpm's git
+      # clone of the backend authenticates. The token is read from the
+      # environment and written only to the runner's git config.
+      - name: Configure Git for private backend dependency
+        run: |
+          git config --global url."https://x-access-token:${WEARIFY_APP_TOKEN}@github.com/".insteadOf "https://github.com/"
+        env:
+          WEARIFY_APP_TOKEN: ${{ steps.wearify-app-token.outputs.token }}
 
       - uses: pnpm/action-setup@v4
 
